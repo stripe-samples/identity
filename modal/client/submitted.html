@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Identity verification submitted</title>
+    <link rel="stylesheet" href="css/normalize.css" />
+    <link rel="stylesheet" href="css/global.css" />
+  </head>
+  <body>
+    <div class="sr-root">
+      <div class="sr-main">
+        <section class="container">
+          <div>
+            <h1>Thanks for submitting your identity document.</h1>
+            <p>We are processing your verification.</p>
+
+            <a href="/">Restart demo</a>
+          </div>
+        </section>
+      </div>
+    </div>
+   </body>
+</html>

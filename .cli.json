@@ -1,0 +1,16 @@
+{
+  "name": "identity",
+  "configureDotEnv": true,
+  "integrations": [
+    {
+      "name": "modal",
+      "clients": ["html"],
+      "servers": ["java", "node", "php", "python", "ruby", "dotnet", "go", "node-typescript"]
+    },
+    {
+      "name": "redirect",
+      "clients": ["html"],
+      "servers": ["java", "node", "php", "python", "ruby", "dotnet", "go", "node-typescript"]
+    }
+  ]
+}
