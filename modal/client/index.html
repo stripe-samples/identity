@@ -23,6 +23,7 @@
     </div>
     <script type="text/javascript">
       document.addEventListener('DOMContentLoaded', async () => {
+
         // Set your publishable key: remember to change this to your live publishable key in production
         // Find your keys here: https://dashboard.stripe.com/apikeys
         const {publishableKey} = await fetch('/config').then(r=>r.json());
@@ -50,7 +51,8 @@
           } catch(e) {
             alert(e.message);
           }
-        });
+        })
+
       })
     </script>
   </body>

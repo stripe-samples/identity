@@ -106,5 +106,5 @@ Sign up to [stay updated with developer news](https://go.stripe.global/dev-diges
 
 ## Authors
 
-[@bz-stripe](https://twitter.com/atav32)
-[@cjavilla-stripe](https://twitter.com/cjav_dev)
+- [@bz-stripe](https://twitter.com/atav32)
+- [@cjavilla-stripe](https://twitter.com/cjav_dev)
