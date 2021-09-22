@@ -78,7 +78,7 @@ jobs:
             DOMAIN=http://web:4242
           EOF
 
-          configure_docker_compose_for_integration "${{ matrix.target.sample }}" "${{ matrix.runtime.server_type }}" ../../client/html "${{ matrix.runtime.server_image }}"
+          configure_docker_compose_for_integration "${{ matrix.target.sample }}" "${{ matrix.runtime.server_type }}" ../../client "${{ matrix.runtime.server_image }}"
 
           docker-compose up -d && wait_web_server
           docker-compose exec -T runner bundle exec rspec spec/${{ matrix.target.tests }}
