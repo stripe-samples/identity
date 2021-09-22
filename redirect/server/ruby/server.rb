@@ -32,21 +32,19 @@ get '/config' do
   }.to_json
 end
 
-post '/create-payment-intent' do
+post '/create-verification-session' do
   content_type 'application/json'
-  data = JSON.parse(request.body.read)
 
-  # Create the payment details based on your logic.
-  # Create a PaymentIntent with the purchase amount and currency.
-  payment_intent = Stripe::PaymentIntent.create(
-    amount: 1000,
-    currency: 'usd',
-  )
+  # See https://stripe.com/docs/api/identity/verification_sessions/create
+  # for the full list of accepted parameters.
+  verification_session = Stripe::Identity::VerificationSession.create({
+    type: 'document', # or 'id_number', or 'address'
+    metadata: {
+      user_id: '{{USER_ID}}', # Optionally pass the ID of the user in your system.
+    },
+  })
 
-  # Send the PaymentIntent client_secret to the client.
-  {
-    clientSecret: payment_intent['client_secret']
-  }.to_json
+  redirect verification_session.url, 303
 end
 
 post '/webhook' do
@@ -77,12 +75,18 @@ post '/webhook' do
     data = JSON.parse(payload, symbolize_names: true)
     event = Stripe::Event.construct_from(data)
   end
-  # Get the type of webhook event sent - used to check the status of PaymentIntents.
-  event_type = event['type']
-  data = event['data']
-  data_object = data['object']
 
-  puts '🔔  Webhook received!' if event_type == 'some.event'
+  case event.type
+  when 'identity.verification_session.requires_input'
+    verification_session = event.data.object
+    puts " ❌ Identity requires input from user: #{verification_session.id}"
+  when 'identity.verification_session.verified'
+    verification_session = event.data.object
+    puts " ✅ Identity verified: #{verification_session.id}"
+  when 'identity.verification_session.canceled', 'identity.verification_session.created', 'identity.verification_session.processing'
+    verification_session = event.data.object
+    puts " 🟡 #{event.type}: #{verification_session.id}"
+  end
 
   content_type 'application/json'
   {

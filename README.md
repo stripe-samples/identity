@@ -1,39 +1,15 @@
-# Stripe Sample Blueprint
+# Identity verification
 
-This is a repo to help you get started with creating a sample.
+This sample shows you how to integrate with Stripe [Identity](https://stripe.com/docs/identity).
 
-1. Clone this repository and add the sample specific logic.
+### Integrations included:
 
-```
-git clone https://github.com/stripe-samples/template
-```
-
-2. Language specific instructions:
-
-   - Update the Java artifactId to use a specific sample related name. Update the README with the right package name.
-
-3. Update the sample sample README below and delete this boilerplate text.
-
-4. Update the .cli.json with details on your sample.
-
-Below is everything you should include in your original sample README. Everything above should be deleted.
-
-# Name of sample
-
-A brief description of what this sample shows. Keep it 3 - 5 sentences.
-
-A quick screenshot of the demo view:
-<img src="https://cf.ltkcdn.net/dogs/images/std/236742-699x450-cutest-puppy-videos.jpg" alt="Preview of sample" align="center">
-
-Features:
-
-- One cool thing about this sample 😃
-- Another cool thing about the sample 🏋️
-- The final cool thing about the sample 💡
+- **Modal** The modal integration allows you to collect identity documents as part of your existing flows. It also limits the amount of private information you handle on your site, allows you to support users in a variety of platforms and languages, and allows you to customize the style to match your branding.
+- **Redirect** The redirect integration decreases the amount of private information you handle on your site, allows you to support users in a variety of platforms and languages, and allows you to customize the style to match your branding.
 
 ## How to run locally
 
-This sample includes 5 server implementations in Node, Ruby, Python, Java, and PHP.
+This sample includes several server implementations.
 
 Follow the steps below to run locally.
 
@@ -48,26 +24,30 @@ If you haven't already installed the CLI, follow the [installation steps](https:
 In your terminal shell, run the Stripe CLI command to clone the sample:
 
 ```
-stripe samples create REPLACE-WITH-NAME
+stripe samples create identity
 ```
 
-The CLI will walk you through picking your integration type, server and client languages, and configuring your .env config file with your Stripe API keys.
+The CLI will walk you through picking your integration type, server and client
+languages, and configuring your `.env` config file with your Stripe API keys.
 
 **Installing and cloning manually**
 
 If you do not want to use the Stripe CLI, you can manually clone and configure the sample yourself:
 
 ```
-git clone https://github.com/stripe-samples/REPLACE-WITH-NAME
+git clone https://github.com/stripe-samples/identity
 ```
 
-Copy the .env.example file into a file named .env in the folder of the server you want to use. For example:
+Copy the `.env.example` file into a file named `.env` in the folder of the
+server you want to use. For example:
 
 ```
 cp .env.example server/node/.env
 ```
 
-You will need a Stripe account in order to run the demo. Once you set up your account, go to the Stripe [developer dashboard](https://stripe.com/docs/development#api-keys) to find your API keys.
+You will need a Stripe account in order to run the demo. Once you set up your
+account, go to the Stripe [developer
+dashboard](https://stripe.com/docs/development#api-keys) to find your API keys.
 
 ```
 STRIPE_PUBLISHABLE_KEY=<replace-with-your-publishable-key>
@@ -90,7 +70,8 @@ npm start
 
 **3. [Optional] Run a webhook locally:**
 
-If you want to test the `using-webhooks` integration with a local webhook on your machine, you can use the Stripe CLI to easily spin one up.
+If you want to test webhook piece of the integration with a local webhook on
+your machine, you can use the Stripe CLI to easily spin one up.
 
 Make sure to [install the CLI](https://stripe.com/docs/stripe-cli) and [link your Stripe account](https://stripe.com/docs/stripe-cli#link-account).
 
@@ -98,21 +79,14 @@ Make sure to [install the CLI](https://stripe.com/docs/stripe-cli) and [link you
 stripe listen --forward-to localhost:4242/webhook
 ```
 
-The CLI will print a webhook secret key to the console. Set `STRIPE_WEBHOOK_SECRET` to this value in your .env file.
+The CLI will print a webhook secret key to the console. Set
+`STRIPE_WEBHOOK_SECRET` to this value in your `.env` file.
 
 You should see events logged in the console where the CLI is running.
 
-When you are ready to create a live webhook endpoint, follow our guide in the docs on [configuring a webhook endpoint in the dashboard](https://stripe.com/docs/webhooks/setup#configure-webhook-settings).
-
-**4. [Mobile clients] Set up the client app:**
-
-Finally, choose a mobile client implementation and follow the instruction in the app's README (e.g. `using-webhooks/client/ios/README.md`) to run.
-
-When the app is running, use `4242424242424242` as a test card number with any CVC code + a future expiration date.
-
-Use the `4000000000003220` test card number to trigger a 3D Secure challenge flow.
-
-Read more about testing on Stripe at https://stripe.com/docs/testing.
+When you are ready to create a live webhook endpoint, follow our guide in the
+docs on [configuring a webhook endpoint in the
+dashboard](https://stripe.com/docs/webhooks/setup#configure-webhook-settings).
 
 ## FAQ
 
@@ -128,9 +102,9 @@ If you have questions, comments, or need help with code, we're here to help:
 - on Twitter at [@StripeDev](https://twitter.com/StripeDev)
 - on Stack Overflow at the [stripe-payments](https://stackoverflow.com/tags/stripe-payments/info) tag
 
-
 Sign up to [stay updated with developer news](https://go.stripe.global/dev-digest).
 
-## Author(s)
+## Authors
 
-[@adreyfus-stripe](https://twitter.com/adrind)
+[@bz-stripe](https://twitter.com/atav32)
+[@cjavilla-stripe](https://twitter.com/cjav_dev)

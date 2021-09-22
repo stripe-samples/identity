@@ -2,88 +2,24 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Stripe Payment Page Sample</title>
-    <meta name="description" content="A demo of Stripe Payment Intents" />
+    <title>Stripe Identity Sample</title>
+    <meta name="description" content="A demo of Stripe Identity" />
 
     <link rel="icon" href="favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="css/normalize.css" />
     <link rel="stylesheet" href="css/global.css" />
     <script src="https://js.stripe.com/v3/"></script>
-    <script src="/script.js" defer></script>
   </head>
-
   <body>
     <div class="sr-root">
       <div class="sr-main">
-        <header class="sr-header">
-          <div class="sr-header__logo"></div>
-        </header>
-        <div class="sr-payment-summary payment-view">
-        </div>        
-        <form id="payment-form" class="sr-payment-form payment-view">
-          <div class="sr-form-row">
-            <label for="card-element">
-              Payment details
-            </label>
-            <div class="sr-combo-inputs">
-              <div class="sr-combo-inputs-row">
-                <input
-                  type="text"
-                  id="name"
-                  placeholder="Name"
-                  autocomplete="cardholder"
-                  class="sr-input"
-                  required
-                />
-              </div>
-              <div class="sr-combo-inputs-row">
-                <div class="sr-input sr-card-element" id="card-element"></div>
-              </div>
-            </div>
-            <div class="sr-field-error" id="card-errors" role="alert"></div>
-          </div>
-          <button id="submit">
-            <div class="spinner hidden" id="spinner"></div>
-            <span id="button-text">Pay <span id="order-amount"></span></span>
-          </button>
-          <div class="sr-legal-text">
-            Your card will be immediately charged.
-          </div>
-        </form>
-        <div class="sr-payment-summary hidden completed-view">
-          <h1>Your test payment <span class="order-status"></span></h1>
-          <h4>
-            View PaymentIntent response:</a>
-          </h4>
-        </div>
-        <div class="sr-result hidden">
-          <p>Payment completed<br /></p>
-          <pre class="sr-callout">
-          </pre>
-        </div>
-      </div>
-      <div class="sr-content">
-        <div class="pasha-image-stack">
-          <img
-            src="https://picsum.photos/280/320?random=1"
-            width="140"
-            height="160"
-          />
-          <img
-            src="https://picsum.photos/280/320?random=2"
-            width="140"
-            height="160"
-          />
-          <img
-            src="https://picsum.photos/280/320?random=3"
-            width="140"
-            height="160"
-          />
-          <img
-            src="https://picsum.photos/280/320?random=4"
-            width="140"
-            height="160"
-          />
+        <div>
+          <h1>Verify your identity to book</h1>
+          <h4>Get ready to take a photo of your ID and a selfie</h4>
+
+          <form action="/create-verification-session" method="POST">
+            <button type="submit">Verify me</button>
+          </form>
         </div>
       </div>
     </div>
