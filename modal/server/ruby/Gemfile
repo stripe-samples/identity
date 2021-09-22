@@ -4,3 +4,5 @@ gem 'dotenv'
 gem 'json'
 gem 'sinatra'
 gem 'stripe', '5.38.0'
+gem 'webrick'
+
