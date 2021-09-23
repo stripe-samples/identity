@@ -38,10 +38,30 @@ post '/create-verification-session' do
   # See https://stripe.com/docs/api/identity/verification_sessions/create
   # for the full list of accepted parameters.
   verification_session = Stripe::Identity::VerificationSession.create({
-    type: 'document', # or 'id_number', or 'address'
+    type: 'document', # 'id_number' | 'address'
     metadata: {
       user_id: '{{USER_ID}}', # Optionally pass the ID of the user in your system.
     },
+
+    # Additional options for configuring the verification session:
+    # options: {
+    #   document: {
+    #     # Array of strings of allowed identity document types.
+    #     allowed_types: ['driving_license'], # passport | id_card
+    #
+    #     # Collect an ID number and perform an ID number check with the
+    #     # document’s extracted name and date of birth.
+    #     require_id_number: true,
+    #
+    #     # Disable image uploads, identity document images have to be captured
+    #     # using the device’s camera.
+    #     require_live_capture: true,
+    #
+    #     # Capture a face image and perform a selfie check comparing a photo
+    #     # ID and a picture of your user’s face.
+    #     require_matching_selfie: true,
+    #   }
+    # },
   })
 
   # Send the VerificationSession client_secret to the client.
@@ -82,7 +102,21 @@ post '/webhook' do
   case event.type
   when 'identity.verification_session.requires_input'
     verification_session = event.data.object
+
     puts " ❌ Identity requires input from user: #{verification_session.id}"
+
+    # At least one of the verification checks failed
+
+    case verification_session.last_error.code
+    when 'document_unverified_other'
+      # The document was invalid
+    when 'document_expired'
+      # The document was expired
+    when 'document_type_not_suported'
+      # The document type was not supported
+    else
+      # ...
+    end
   when 'identity.verification_session.verified'
     verification_session = event.data.object
     puts " ✅ Identity verified: #{verification_session.id}"
