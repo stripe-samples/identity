@@ -37,26 +37,40 @@ app.get('/config', (req, res) => {
   });
 });
 
-app.post('/create-payment-intent', async (req, res) => {
-  const { currency } = req.body;
-
-  // Create a PaymentIntent with the amount, currency, and a payment method type.
-  //
-  // See the documentation [0] for the full list of supported parameters.
-  //
-  // [0] https://stripe.com/docs/api/payment_intents/create
+app.post('/create-verification-session', async (req, res) => {
   try {
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: 1999,
-      currency: currency,
+    const verificationSession = await stripe.identity.verificationSessions.create({
+      type: 'document',
+      metadata: {
+        user_id: '{{USER_ID}}',
+      }
+
+      // Additional options for configuring the verification session:
+      // options: {
+      //   document: {
+      //     # Array of strings of allowed identity document types.
+      //     allowed_types: ['driving_license'], # passport | id_card
+      //
+      //     # Collect an ID number and perform an ID number check with the
+      //     # document’s extracted name and date of birth.
+      //     require_id_number: true,
+      //
+      //     # Disable image uploads, identity document images have to be captured
+      //     # using the device’s camera.
+      //     require_live_capture: true,
+      //
+      //     # Capture a face image and perform a selfie check comparing a photo
+      //     # ID and a picture of your user’s face.
+      //     require_matching_selfie: true,
+      //   }
+      // },
     });
 
     // Send publishable key and PaymentIntent details to client
-    res.send({
-      clientSecret: paymentIntent.client_secret
-    });
+    res.redirect(303, verificationSession.url)
 
   } catch(e) {
+    console.log(e)
     return res.status(400).send({
       error: {
         message: e.message
@@ -64,6 +78,7 @@ app.post('/create-payment-intent', async (req, res) => {
     });
   }
 });
+
 
 // Expose a endpoint as a webhook handler for asynchronous events.
 // Configure your webhook in the stripe developer dashboard

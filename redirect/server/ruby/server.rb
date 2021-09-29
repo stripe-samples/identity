@@ -9,7 +9,7 @@ Dotenv.load
 
 # For sample support and debugging, not required for production:
 Stripe.set_app_info(
-  'stripe-samples/<name-of-sample>/[<name-of-integration-type>]',
+  'stripe-samples/identity/redirect',
   version: '0.0.1',
   url: 'https://github.com/stripe-samples'
 )

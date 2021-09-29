@@ -49,21 +49,39 @@ app.get('/config', (_: express.Request, res: express.Response): void => {
 });
 
 app.post(
-  '/create-payment-intent',
+  '/create-verification-session',
   async (req: express.Request, res: express.Response): Promise<void> => {
-    const { currency }: { currency: string } = req.body;
-
     try {
-      const paymentIntent: Stripe.PaymentIntent = await stripe.paymentIntents.create({
-        amount: 1999,
-        currency
+      const verificationSession: Stripe.Identity.VerificationSession = await stripe.identity.verificationSessions.create({
+        type: 'document',
+        metadata: {
+          user_id: '{{USER_ID}}',
+        }
+        // Additional options for configuring the verification session:
+        // options: {
+        //   document: {
+        //     # Array of strings of allowed identity document types.
+        //     allowed_types: ['driving_license'], # passport | id_card
+        //
+        //     # Collect an ID number and perform an ID number check with the
+        //     # document’s extracted name and date of birth.
+        //     require_id_number: true,
+        //
+        //     # Disable image uploads, identity document images have to be captured
+        //     # using the device’s camera.
+        //     require_live_capture: true,
+        //
+        //     # Capture a face image and perform a selfie check comparing a photo
+        //     # ID and a picture of your user’s face.
+        //     require_matching_selfie: true,
+        //   }
+        // },
       });
 
       // Send publishable key and PaymentIntent client_secret to client.
-      res.send({
-        clientSecret: paymentIntent.client_secret,
-      });
+      res.redirect(303, verificationSession.url);
     } catch (e) {
+      console.log(e);
       res.status(400).send({
         error: {
           message: e.message,

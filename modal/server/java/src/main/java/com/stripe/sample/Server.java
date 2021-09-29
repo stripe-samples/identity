@@ -14,6 +14,7 @@ import com.google.gson.annotations.SerializedName;
 import com.stripe.Stripe;
 import com.stripe.net.ApiResource;
 import com.stripe.model.Event;
+import com.stripe.model.StripeObject;
 import com.stripe.model.EventDataObjectDeserializer;
 import com.stripe.model.identity.VerificationSession;
 import com.stripe.exception.*;
@@ -85,10 +86,10 @@ public class Server {
         .build();
 
       try {
-        // Create a PaymentIntent with the order amount and currency
+        // Create a VerificationSession
         VerificationSession session = VerificationSession.create(createParams);
 
-        // Send PaymentIntent details to client
+        // Send VerificationSession client_secret to client
         return gson.toJson(new CreateVerificationSessionResponse(session.getClientSecret()));
       } catch(StripeException e) {
         response.status(400);
@@ -114,11 +115,14 @@ public class Server {
         return "";
       }
 
+      // Deserialize the nested object inside the event
+      EventDataObjectDeserializer dataObjectDeserializer = event.getDataObjectDeserializer();
+      StripeObject stripeObject = null;
       switch(event.getType()) {
         case "identity.verification_session.verified":
           // All the verification checks passed
           if (dataObjectDeserializer.getObject().isPresent()) {
-            verificationSession = (VerificationSession) dataObjectDeserializer.getObject().get();
+            VerificationSession verificationSession = (VerificationSession) dataObjectDeserializer.getObject().get();
           } else {
             // Deserialization failed, probably due to an API version mismatch.
             // Refer to the Javadoc documentation on `EventDataObjectDeserializer` for
@@ -128,20 +132,20 @@ public class Server {
         case "identity.verification_session.requires_input":
           // At least one of the verification checks failed
           if (dataObjectDeserializer.getObject().isPresent()) {
-            verificationSession = (VerificationSession) dataObjectDeserializer.getObject().get();
+            VerificationSession verificationSession = (VerificationSession) dataObjectDeserializer.getObject().get();
 
             switch(verificationSession.getLastError().getCode()) {
-            case "document_unverified_other":
-              // the document was invalid
-              break;
-            case "document_expired":
-               // the document was expired
-               break;
-            case "document_type_not_supported":
-              // document type not supported
-              break;
-            default:
-              // ...
+              case "document_unverified_other":
+                // the document was invalid
+                break;
+              case "document_expired":
+                // the document was expired
+                break;
+              case "document_type_not_supported":
+                // document type not supported
+                break;
+              default:
+                // ...
             }
           } else {
             // Deserialization failed, probably due to an API version mismatch.
@@ -152,7 +156,6 @@ public class Server {
         default:
           // other event type
       }
-
       response.status(200);
       return "";
     });

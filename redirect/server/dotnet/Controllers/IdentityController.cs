@@ -9,12 +9,12 @@ using Stripe.Checkout;
 
 namespace server.Controllers
 {
-    public class PaymentsController : Controller
+    public class IdentityController : Controller
     {
         public readonly IOptions<StripeOptions> options;
         private readonly IStripeClient client;
 
-        public PaymentsController(IOptions<StripeOptions> options)
+        public IdentityController(IOptions<StripeOptions> options)
         {
             this.options = options;
             this.client = new StripeClient(this.options.Value.SecretKey);
@@ -30,24 +30,23 @@ namespace server.Controllers
             };
         }
 
-        [HttpPost("create-payment-intent")]
-        public async Task<IActionResult> CreatePaymentIntent([FromBody] CreatePaymentIntentRequest req)
+        [HttpPost("create-verification-session")]
+        public async Task<IActionResult> CreateVerificationSession()
         {
-          var options = new PaymentIntentCreateOptions
+          var options = new VerificationSessionCreateOptions
           {
-            Amount = 1999,
-            Currency = req.Currency,
+            Type = "document",
           };
 
-          var service = new PaymentIntentService(this.client);
+          var service = new VerificationSessionService(this.client);
 
           try
           {
-            var paymentIntent = await service.CreateAsync(options);
+            var verificationSession = await service.CreateAsync(options);
 
-            return Ok(new CreatePaymentIntentResponse
+            return Ok(new CreateVerificationSessionResponse
             {
-                ClientSecret = paymentIntent.ClientSecret,
+                ClientSecret = verificationSession.ClientSecret,
             });
           }
           catch (StripeException e)

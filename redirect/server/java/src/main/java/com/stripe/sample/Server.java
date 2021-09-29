@@ -14,25 +14,17 @@ import com.google.gson.annotations.SerializedName;
 import com.stripe.Stripe;
 import com.stripe.net.ApiResource;
 import com.stripe.model.Event;
+import com.stripe.model.StripeObject;
 import com.stripe.model.EventDataObjectDeserializer;
-import com.stripe.model.PaymentIntent;
+import com.stripe.model.identity.VerificationSession;
 import com.stripe.exception.*;
 import com.stripe.net.Webhook;
-import com.stripe.param.PaymentIntentCreateParams;
+import com.stripe.param.identity.VerificationSessionCreateParams;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class Server {
   private static Gson gson = new Gson();
-
-  static class CreatePaymentRequest {
-    @SerializedName("currency")
-    String currency;
-
-    public String getCurrency() {
-      return currency;
-    }
-  }
 
   static class ConfigResponse {
     private String publishableKey;
@@ -51,10 +43,11 @@ public class Server {
     }
   }
 
-  static class CreatePaymentResponse {
+  static class CreateVerificationSessionResponse {
+    @SerializedName("client_secret")
     private String clientSecret;
 
-    public CreatePaymentResponse(String clientSecret) {
+    public CreateVerificationSessionResponse(String clientSecret) {
       this.clientSecret = clientSecret;
     }
   }
@@ -83,23 +76,21 @@ public class Server {
       return gson.toJson(new ConfigResponse(dotenv.get("STRIPE_PUBLISHABLE_KEY")));
     });
 
-    post("/create-payment-intent", (request, response) -> {
+    post("/create-verification-session", (request, response) -> {
       response.type("application/json");
 
-      CreatePaymentRequest postBody = gson.fromJson(request.body(), CreatePaymentRequest.class);
-
-      PaymentIntentCreateParams createParams = new PaymentIntentCreateParams
+      VerificationSessionCreateParams createParams = new VerificationSessionCreateParams
         .Builder()
-        .setCurrency(postBody.getCurrency())
-        .setAmount(1999L)
+        .setType(VerificationSessionCreateParams.Type.DOCUMENT)
         .build();
 
       try {
-        // Create a PaymentIntent with the order amount and currency
-        PaymentIntent intent = PaymentIntent.create(createParams);
+        // Create a VerificationSession with the order amount and currency
+        VerificationSession session = VerificationSession.create(createParams);
 
-        // Send PaymentIntent details to client
-        return gson.toJson(new CreatePaymentResponse(intent.getClientSecret()));
+        // Send VerificationSession details to client
+        response.redirect(session.getUrl(), 303);
+        return "";
       } catch(StripeException e) {
         response.status(400);
         return gson.toJson(new FailureResponse(e.getMessage()));
@@ -124,11 +115,14 @@ public class Server {
         return "";
       }
 
+      // Deserialize the nested object inside the event
+      EventDataObjectDeserializer dataObjectDeserializer = event.getDataObjectDeserializer();
+      StripeObject stripeObject = null;
       switch(event.getType()) {
         case "identity.verification_session.verified":
           // All the verification checks passed
           if (dataObjectDeserializer.getObject().isPresent()) {
-            verificationSession = (VerificationSession) dataObjectDeserializer.getObject().get();
+            VerificationSession verificationSession = (VerificationSession) dataObjectDeserializer.getObject().get();
           } else {
             // Deserialization failed, probably due to an API version mismatch.
             // Refer to the Javadoc documentation on `EventDataObjectDeserializer` for
@@ -138,7 +132,7 @@ public class Server {
         case "identity.verification_session.requires_input":
           // At least one of the verification checks failed
           if (dataObjectDeserializer.getObject().isPresent()) {
-            verificationSession = (VerificationSession) dataObjectDeserializer.getObject().get();
+            VerificationSession verificationSession = (VerificationSession) dataObjectDeserializer.getObject().get();
 
             switch(verificationSession.getLastError().getCode()) {
               case "document_unverified_other":

@@ -12,7 +12,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/stripe/stripe-go/v72"
-	"github.com/stripe/stripe-go/v72/paymentintent"
+	"github.com/stripe/stripe-go/v72/identity/verificationsession"
 	"github.com/stripe/stripe-go/v72/webhook"
 )
 
@@ -33,7 +33,7 @@ func main() {
 
 	http.Handle("/", http.FileServer(http.Dir(os.Getenv("STATIC_DIR"))))
 	http.HandleFunc("/config", handleConfig)
-	http.HandleFunc("/create-payment-intent", handleCreatePaymentIntent)
+	http.HandleFunc("/create-verification-session", handleCreateVerificationSession)
 	http.HandleFunc("/webhook", handleWebhook)
 
 	log.Println("server running at 0.0.0.0:4242")
@@ -64,20 +64,33 @@ func handleConfig(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-type paymentIntentCreateReq struct {
-	Currency string `json:"currency"`
-}
+func handleCreateVerificationSession(w http.ResponseWriter, r *http.Request) {
+	params := &stripe.IdentityVerificationSessionParams{
+		Type: stripe.String("document"),
 
-func handleCreatePaymentIntent(w http.ResponseWriter, r *http.Request) {
-	req := paymentIntentCreateReq{}
-	json.NewDecoder(r.Body).Decode(&req)
-
-	params := &stripe.PaymentIntentParams{
-		Amount:   stripe.Int64(1999),
-		Currency: stripe.String(req.Currency),
+		// Additional options for configuring the verification session:
+		// Options: &stripe.IdentityVerificationSessionOptionsParams{
+		//   Document: &stripe.IdentityVerificationSessionOptionsDocumentParams{
+		//     // Array of strings of allowed identity document types.
+		//     AllowedTypes: stripe.StringSlice([]string{"driving_license"}), // passport | id_card
+		//
+		//     // Collect an ID number and perform an ID number check with the
+		//     // document’s extracted name and date of birth.
+		//     RequireIDNumber: stripe.Bool(true),
+		//
+		//     // Disable image uploads, identity document images have to be captured
+		//     // using the device’s camera.
+		//     RequireLiveCapture: stripe.Bool(true),
+		//
+		//     // Capture a face image and perform a selfie check comparing a photo
+		//     // ID and a picture of your user’s face.
+		//     RequireMatchingSelfie: stripe.Bool(true),
+		//   }
+		// },
 	}
 
-	pi, err := paymentintent.New(params)
+	params.AddMetadata("user_id", "{{USER_ID}}")
+	vs, err := verificationsession.New(params)
 	if err != nil {
 		// Try to safely cast a generic error to a stripe.Error so that we can get at
 		// some additional Stripe-specific information about what went wrong.
@@ -92,11 +105,7 @@ func handleCreatePaymentIntent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, struct {
-		ClientSecret string `json:"clientSecret"`
-	}{
-		ClientSecret: pi.ClientSecret,
-	})
+	http.Redirect(w, r, vs.URL, http.StatusSeeOther)
 }
 
 func handleWebhook(w http.ResponseWriter, r *http.Request) {
