@@ -86,7 +86,7 @@ namespace server.Controllers
 
             } else if (stripeEvent.Type == Events.IdentityVerificationSessionRequiresInput) {
               var verificationSession = stripeEvent.Data.Object as VerificationSession;
-              if (verificationSession.lastError.Code == "document_unverified_other") {
+              if (verificationSession.LastError.Code == "document_unverified_other") {
                 // The document was invalid
               } else if (verificationSession.LastError.Code == "document_expired") {
                 // The document was expired
