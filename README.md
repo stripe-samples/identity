@@ -4,8 +4,8 @@ This sample shows you how to integrate with Stripe [Identity](https://stripe.com
 
 ### Integrations included:
 
-- **Modal** The modal integration allows you to collect identity documents as part of your existing flows. It also limits the amount of private information you handle on your site, allows you to support users in a variety of platforms and languages, and allows you to customize the style to match your branding.
-- **Redirect** The redirect integration decreases the amount of private information you handle on your site, allows you to support users in a variety of platforms and languages, and allows you to customize the style to match your branding.
+- [**Modal**](./modal) The modal integration allows you to collect identity documents as part of your existing flows. It also limits the amount of private information you handle on your site, allows you to support users in a variety of platforms and languages, and allows you to customize the style to match your branding.
+- [**Redirect**](./redirect) The redirect integration decreases the amount of private information you handle on your site, allows you to support users in a variety of platforms and languages, and allows you to customize the style to match your branding.
 
 ## How to run locally
 
