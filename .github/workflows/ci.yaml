@@ -16,44 +16,44 @@ jobs:
             server_image: ruby:3.0
           - server_type: ruby
             server_image: ruby:2.6
-          # - server_type: node
-          #   server_image: node:14.17
-          # - server_type: node
-          #   server_image: node:12.22
-          # - server_type: python
-          #   server_image: python:3.9
-          # - server_type: python
-          #   server_image: python:3.6
-          # - server_type: java
-          #   server_image: maven:3.8-openjdk-16
-          # - server_type: java
-          #   server_image: maven:3.8-openjdk-8
-          # - server_type: go
-          #   server_image: golang:1.16
-          # - server_type: go
-          #   server_image: golang:1.15
-          # - server_type: dotnet
-          #   server_image: mcr.microsoft.com/dotnet/sdk:5.0
-          # - server_type: dotnet
-          #   server_image: mcr.microsoft.com/dotnet/sdk:3.1
+          - server_type: node
+            server_image: node:14.17
+          - server_type: node
+            server_image: node:12.22
+          - server_type: python
+            server_image: python:3.9
+          - server_type: python
+            server_image: python:3.6
+          - server_type: java
+            server_image: maven:3.8-openjdk-16
+          - server_type: java
+            server_image: maven:3.8-openjdk-8
+          - server_type: go
+            server_image: golang:1.16
+          - server_type: go
+            server_image: golang:1.15
+          - server_type: dotnet
+            server_image: mcr.microsoft.com/dotnet/sdk:5.0
+          - server_type: dotnet
+            server_image: mcr.microsoft.com/dotnet/sdk:3.1
         target:
           - sample: modal
             tests: modal_server_spec.rb
           - sample: redirect
             tests: redirect_server_spec.rb
-        # include:
-        #   - runtime:
-        #       server_type: node-typescript
-        #       server_image: node:14.17
-        #     target:
-        #       sample: modal
-        #       tests: modal_server_spec.rb
-        #   - runtime:
-        #       server_type: node-typescript
-        #       server_image: node:12.22
-        #     target:
-        #       sample: redirect
-        #       tests: redirect_server_spec.rb
+        include:
+          - runtime:
+              server_type: node-typescript
+              server_image: node:14.17
+            target:
+              sample: modal
+              tests: modal_server_spec.rb
+          - runtime:
+              server_type: node-typescript
+              server_image: node:12.22
+            target:
+              sample: redirect
+              tests: redirect_server_spec.rb
     steps:
       - uses: actions/checkout@v2
 
