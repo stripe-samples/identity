@@ -12,8 +12,8 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/stripe/stripe-go/v72"
-	"github.com/stripe/stripe-go/v72/webhook"
 	"github.com/stripe/stripe-go/v72/paymentintent"
+	"github.com/stripe/stripe-go/v72/webhook"
 )
 
 func main() {
@@ -26,7 +26,7 @@ func main() {
 
 	// For sample support and debugging, not required for production:
 	stripe.SetAppInfo(&stripe.AppInfo{
-		Name:    "stripe-samples/your-sample-name",
+		Name:    "stripe-samples/identity/redirect",
 		Version: "0.0.1",
 		URL:     "https://github.com/stripe-samples",
 	})
@@ -65,7 +65,7 @@ func handleConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 type paymentIntentCreateReq struct {
-	Currency          string `json:"currency"`
+	Currency string `json:"currency"`
 }
 
 func handleCreatePaymentIntent(w http.ResponseWriter, r *http.Request) {
@@ -73,8 +73,8 @@ func handleCreatePaymentIntent(w http.ResponseWriter, r *http.Request) {
 	json.NewDecoder(r.Body).Decode(&req)
 
 	params := &stripe.PaymentIntentParams{
-		Amount:             stripe.Int64(1999),
-		Currency:           stripe.String(req.Currency),
+		Amount:   stripe.Int64(1999),
+		Currency: stripe.String(req.Currency),
 	}
 
 	pi, err := paymentintent.New(params)
@@ -118,8 +118,37 @@ func handleWebhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if event.Type == "checkout.session.completed" {
-		fmt.Println("Checkout Session completed!")
+	switch event.Type {
+	case "identity.verification_session.verified":
+		fmt.Fprintf(os.Stdout, "All the verification checks passed\n")
+		var verificationSession stripe.IdentityVerificationSession
+		err := json.Unmarshal(event.Data.Raw, &verificationSession)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error parsing webhook JSON: %v\n", err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+	case "identity.verification_session.requires_input":
+		fmt.Fprintf(os.Stdout, "At least one of the verification checks failed\n")
+		var verificationSession stripe.IdentityVerificationSession
+		err := json.Unmarshal(event.Data.Raw, &verificationSession)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error parsing webhook JSON: %v\n", err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		switch verificationSession.LastError.Code {
+		case "document_unverified_other":
+			fmt.Fprintf(os.Stdout, "The document was invalid")
+		case "document_expired":
+			fmt.Fprintf(os.Stdout, "The document was expired")
+		case "document_type_not_supported":
+			fmt.Fprintf(os.Stdout, "The document type was not supported")
+		default:
+			fmt.Fprintf(os.Stdout, "Other document error code")
+		}
+	default:
+		fmt.Fprintf(os.Stdout, "Unhandled event type: %v", event.Type)
 	}
 
 	writeJSON(w, nil)

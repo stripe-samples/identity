@@ -21,13 +21,24 @@ catch (Exception $e) {
   exit;
 }
 
-if ($event->type == 'payment_intent.succeeded') {
-  // Fulfill any orders, e-mail receipts, etc
-  // To cancel the payment you will need to issue a Refund (https://stripe.com/docs/api/refunds)
-  error_log('💰 Payment received!');
+
+if ($event->type == 'identity.verification_session.verified') {
+  // All the verification checks passed
+  $verification_session = event->data->object;
+} elseif ($event->type == 'identity.verification_session.requires_input') {
+  # At least one of the verification checks failed
+  $verification_session = event->data->object;
+
+  if ($verification_session->last_error->code == 'document_unverified_other') {
+    # The document was invalid
+  } elseif ($verification_session->last_error->code == 'document_expired') {
+    # The document was expired
+  } elseif $verification_session->last_error->code == 'document_type_not_suported') {
+    # The document type was not supported
+  } else {
+    # ...
+  }
 }
-else if ($event->type == 'payment_intent.payment_failed') {
-  error_log('❌ Payment failed.');
-}
+
 
 echo json_encode(['status' => 'success']);

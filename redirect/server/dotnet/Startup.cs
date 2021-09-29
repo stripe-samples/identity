@@ -28,7 +28,7 @@ namespace server
             // For sample support and debugging, not required for production:
             StripeConfiguration.AppInfo = new AppInfo
             {
-                Name = "stripe-samples/your-sample-name",
+                Name = "stripe-samples/identity/redirect",
                 Url = "https://github.com/stripe-samples",
                 Version = "0.0.1",
             };

@@ -1,8 +1,8 @@
 using Newtonsoft.Json;
 
-public class CreatePaymentIntentResponse
+public class CreateVerificationSessionResponse
 {
-  [JsonProperty("clientSecret")]
+  [JsonProperty("client_secret")]
   public string ClientSecret { get; set; }
 }
 

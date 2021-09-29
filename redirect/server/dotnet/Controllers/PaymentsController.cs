@@ -80,11 +80,22 @@ namespace server.Controllers
                 return BadRequest();
             }
 
-            if (stripeEvent.Type == "checkout.session.completed")
-            {
-                var session = stripeEvent.Data.Object as Stripe.Checkout.Session;
-                Console.WriteLine($"Session ID: {session.Id}");
-                // Take some action based on session.
+
+            if (stripeEvent.Type == Events.IdentityVerificationSessionVerified) {
+              var verificationSession = stripeEvent.Data.Object as VerificationSession;
+              // All the verification checks passed
+
+            } else if (stripeEvent.Type == Events.IdentityVerificationSessionRequiresInput) {
+              var verificationSession = stripeEvent.Data.Object as VerificationSession;
+              if (verificationSession.lastError.Code == "document_unverified_other") {
+                // The document was invalid
+              } else if (verificationSession.LastError.Code == "document_expired") {
+                // The document was expired
+              } else if (verificationSession.LastError.Code == "document_type_not_supported") {
+                // The document type was not supported
+              } else {
+                // ...
+              }
             }
 
             return Ok();

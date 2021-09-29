@@ -10,7 +10,7 @@ load_dotenv(find_dotenv())
 
 # For sample support and debugging, not required for production:
 stripe.set_app_info(
-    'stripe-samples/your-sample-name',
+    'stripe-samples/identity/modal',
     version='0.0.1',
     url='https://github.com/stripe-samples')
 
@@ -30,28 +30,16 @@ def get_config():
     return jsonify({'publishableKey': os.getenv('STRIPE_PUBLISHABLE_KEY')})
 
 
-@app.route('/create-payment-intent', methods=['POST'])
-def create_payment():
-    data = json.loads(request.data)
-
-    # Each payment method type has support for different currencies. In order to
-    # support many payment method types and several currencies, this server
-    # endpoint accepts both the payment method type and the currency as
-    # parameters.
-    #
-    # Some example payment method types include `card`, `ideal`, and `alipay`.
-    currency = data['currency']
-
-    # Create a PaymentIntent with the amount, currency, and a payment method type.
-    #
-    # See the documentation [0] for the full list of supported parameters.
-    #
-    # [0] https://stripe.com/docs/api/payment_intents/create
+@app.route('/create-verification-session', methods=['POST'])
+def create_verification_session():
     try:
-        intent = stripe.PaymentIntent.create(amount=1999, currency='usd')
-
-        # Send PaymentIntent details to the front end.
-        return jsonify({'clientSecret': intent.client_secret})
+        verification_session = stripe.identity.VerificationSession.create(
+            type='document',
+            metadata={
+                'user_id': '{{USER_ID}}',
+            }
+        )
+        return jsonify({'client_secret': verification_session.client_secret})
     except stripe.error.StripeError as e:
         return jsonify({'error': {'message': str(e)}}), 400
     except Exception as e:
@@ -81,12 +69,22 @@ def webhook_received():
         event_type = request_data['type']
     data_object = data['object']
 
-    if event_type == 'payment_intent.succeeded':
-        print('💰 Payment received!')
-        # Fulfill any orders, e-mail receipts, etc
-        # To cancel the payment you will need to issue a Refund (https://stripe.com/docs/api/refunds)
-    elif event_type == 'payment_intent.payment_failed':
-        print('❌ Payment failed.')
+    if event['type'] == 'identity.verification_session.verified':
+        print("All the verification checks passed")
+        verification_session = data_object
+
+    elif event['type'] == 'identity.verification_session.requires_input':
+        print("At least one verification check failed")
+        verification_session = data_object
+
+        if verification_session.last_error.code == 'document_unverified_other':
+            print("The document was invalid")
+        elif verification_session.last_error.code == 'document_expired':
+            print("The document was expired")
+        elif verification_session.last_error.code == 'document_type_not_suported':
+            print("The document type was not supported")
+        else:
+            print("other error code")
     return jsonify({'status': 'success'})
 
 

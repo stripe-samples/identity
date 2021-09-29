@@ -5,16 +5,16 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Stripe;
-using Stripe.Checkout;
+using Stripe.Identity;
 
 namespace server.Controllers
 {
-    public class PaymentsController : Controller
+    public class IdentityController : Controller
     {
         public readonly IOptions<StripeOptions> options;
         private readonly IStripeClient client;
 
-        public PaymentsController(IOptions<StripeOptions> options)
+        public IdentityController(IOptions<StripeOptions> options)
         {
             this.options = options;
             this.client = new StripeClient(this.options.Value.SecretKey);
@@ -30,24 +30,23 @@ namespace server.Controllers
             };
         }
 
-        [HttpPost("create-payment-intent")]
-        public async Task<IActionResult> CreatePaymentIntent([FromBody] CreatePaymentIntentRequest req)
+        [HttpPost("create-verification-session")]
+        public async Task<IActionResult> CreateVerificationSession()
         {
-          var options = new PaymentIntentCreateOptions
+          var options = new VerificationSessionCreateOptions
           {
-            Amount = 1999,
-            Currency = req.Currency,
+            Type = "document",
           };
 
-          var service = new PaymentIntentService(this.client);
+          var service = new VerificationSessionService(this.client);
 
           try
           {
-            var paymentIntent = await service.CreateAsync(options);
+            var verificationSession = await service.CreateAsync(options);
 
-            return Ok(new CreatePaymentIntentResponse
+            return Ok(new CreateVerificationSessionResponse
             {
-                ClientSecret = paymentIntent.ClientSecret,
+                ClientSecret = verificationSession.ClientSecret,
             });
           }
           catch (StripeException e)
@@ -80,11 +79,22 @@ namespace server.Controllers
                 return BadRequest();
             }
 
-            if (stripeEvent.Type == "checkout.session.completed")
-            {
-                var session = stripeEvent.Data.Object as Stripe.Checkout.Session;
-                Console.WriteLine($"Session ID: {session.Id}");
-                // Take some action based on session.
+
+            if (stripeEvent.Type == Events.IdentityVerificationSessionVerified) {
+              var verificationSession = stripeEvent.Data.Object as VerificationSession;
+              // All the verification checks passed
+
+            } else if (stripeEvent.Type == Events.IdentityVerificationSessionRequiresInput) {
+              var verificationSession = stripeEvent.Data.Object as VerificationSession;
+              if (verificationSession.lastError.Code == "document_unverified_other") {
+                // The document was invalid
+              } else if (verificationSession.LastError.Code == "document_expired") {
+                // The document was expired
+              } else if (verificationSession.LastError.Code == "document_type_not_supported") {
+                // The document type was not supported
+              } else {
+                // ...
+              }
             }
 
             return Ok();

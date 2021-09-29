@@ -15,24 +15,15 @@ import com.stripe.Stripe;
 import com.stripe.net.ApiResource;
 import com.stripe.model.Event;
 import com.stripe.model.EventDataObjectDeserializer;
-import com.stripe.model.PaymentIntent;
+import com.stripe.model.identity.VerificationSession;
 import com.stripe.exception.*;
 import com.stripe.net.Webhook;
-import com.stripe.param.PaymentIntentCreateParams;
+import com.stripe.param.identity.VerificationSessionCreateParams;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class Server {
   private static Gson gson = new Gson();
-
-  static class CreatePaymentRequest {
-    @SerializedName("currency")
-    String currency;
-
-    public String getCurrency() {
-      return currency;
-    }
-  }
 
   static class ConfigResponse {
     private String publishableKey;
@@ -51,10 +42,11 @@ public class Server {
     }
   }
 
-  static class CreatePaymentResponse {
+  static class CreateVerificationSessionResponse {
+    @SerializedName("client_secret")
     private String clientSecret;
 
-    public CreatePaymentResponse(String clientSecret) {
+    public CreateVerificationSessionResponse(String clientSecret) {
       this.clientSecret = clientSecret;
     }
   }
@@ -67,7 +59,7 @@ public class Server {
 
     // For sample support and debugging, not required for production:
     Stripe.setAppInfo(
-        "stripe-samples/<your-sample-name>",
+        "stripe-samples/identity/modal",
         "0.0.1",
         "https://github.com/stripe-samples"
         );
@@ -84,23 +76,20 @@ public class Server {
       return gson.toJson(new ConfigResponse(dotenv.get("STRIPE_PUBLISHABLE_KEY")));
     });
 
-    post("/create-payment-intent", (request, response) -> {
+    post("/create-verification-session", (request, response) -> {
       response.type("application/json");
 
-      CreatePaymentRequest postBody = gson.fromJson(request.body(), CreatePaymentRequest.class);
-
-      PaymentIntentCreateParams createParams = new PaymentIntentCreateParams
+      VerificationSessionCreateParams createParams = new VerificationSessionCreateParams
         .Builder()
-        .setCurrency(postBody.getCurrency())
-        .setAmount(1999L)
+        .setType(VerificationSessionCreateParams.Type.DOCUMENT)
         .build();
 
       try {
         // Create a PaymentIntent with the order amount and currency
-        PaymentIntent intent = PaymentIntent.create(createParams);
+        VerificationSession session = VerificationSession.create(createParams);
 
         // Send PaymentIntent details to client
-        return gson.toJson(new CreatePaymentResponse(intent.getClientSecret()));
+        return gson.toJson(new CreateVerificationSessionResponse(session.getClientSecret()));
       } catch(StripeException e) {
         response.status(400);
         return gson.toJson(new FailureResponse(e.getMessage()));
@@ -125,20 +114,43 @@ public class Server {
         return "";
       }
 
-      switch (event.getType()) {
-        case "payment_intent.succeeded":
-          // Fulfill any orders, e-mail receipts, etc
-          // To cancel the payment you will need to issue a Refund
-          // (https://stripe.com/docs/api/refunds)
-          System.out.println("💰Payment received!");
+      switch(event.getType()) {
+        case "identity.verification_session.verified":
+          // All the verification checks passed
+          if (dataObjectDeserializer.getObject().isPresent()) {
+            verificationSession = (VerificationSession) dataObjectDeserializer.getObject().get();
+          } else {
+            // Deserialization failed, probably due to an API version mismatch.
+            // Refer to the Javadoc documentation on `EventDataObjectDeserializer` for
+            // instructions on how to handle this case, or return an error here.
+          }
           break;
-        case "payment_intent.payment_failed":
-          System.out.println("❌ Payment failed.");
+        case "identity.verification_session.requires_input":
+          // At least one of the verification checks failed
+          if (dataObjectDeserializer.getObject().isPresent()) {
+            verificationSession = (VerificationSession) dataObjectDeserializer.getObject().get();
+
+            switch(verificationSession.getLastError().getCode()) {
+            case "document_unverified_other":
+              // the document was invalid
+              break;
+            case "document_expired":
+               // the document was expired
+               break;
+            case "document_type_not_supported":
+              // document type not supported
+              break;
+            default:
+              // ...
+            }
+          } else {
+            // Deserialization failed, probably due to an API version mismatch.
+            // Refer to the Javadoc documentation on `EventDataObjectDeserializer` for
+            // instructions on how to handle this case, or return an error here.
+          }
           break;
         default:
-          // Unexpected event type
-          response.status(400);
-          return "";
+          // other event type
       }
 
       response.status(200);

@@ -50,7 +50,7 @@ DOMAIN=http://localhost:4242</pre>
 
 // For sample support and debugging. Not required for production:
 \Stripe\Stripe::setAppInfo(
-  "stripe-samples/<your sample name>",
+  "stripe-samples/identity/modal",
   "0.0.2",
   "https://github.com/stripe-samples"
 );

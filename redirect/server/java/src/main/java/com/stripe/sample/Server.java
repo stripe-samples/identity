@@ -67,10 +67,9 @@ public class Server {
 
     // For sample support and debugging, not required for production:
     Stripe.setAppInfo(
-        "stripe-samples/<your-sample-name>",
+        "stripe-samples/identity/redirect",
         "0.0.1",
-        "https://github.com/stripe-samples"
-        );
+        "https://github.com/stripe-samples");
 
     staticFiles.externalLocation(
         Paths.get(
@@ -125,22 +124,44 @@ public class Server {
         return "";
       }
 
-      switch (event.getType()) {
-        case "payment_intent.succeeded":
-          // Fulfill any orders, e-mail receipts, etc
-          // To cancel the payment you will need to issue a Refund
-          // (https://stripe.com/docs/api/refunds)
-          System.out.println("💰Payment received!");
+      switch(event.getType()) {
+        case "identity.verification_session.verified":
+          // All the verification checks passed
+          if (dataObjectDeserializer.getObject().isPresent()) {
+            verificationSession = (VerificationSession) dataObjectDeserializer.getObject().get();
+          } else {
+            // Deserialization failed, probably due to an API version mismatch.
+            // Refer to the Javadoc documentation on `EventDataObjectDeserializer` for
+            // instructions on how to handle this case, or return an error here.
+          }
           break;
-        case "payment_intent.payment_failed":
-          System.out.println("❌ Payment failed.");
+        case "identity.verification_session.requires_input":
+          // At least one of the verification checks failed
+          if (dataObjectDeserializer.getObject().isPresent()) {
+            verificationSession = (VerificationSession) dataObjectDeserializer.getObject().get();
+
+            switch(verificationSession.getLastError().getCode()) {
+              case "document_unverified_other":
+                // the document was invalid
+                break;
+              case "document_expired":
+                // the document was expired
+                break;
+              case "document_type_not_supported":
+                // document type not supported
+                break;
+              default:
+                // ...
+            }
+          } else {
+            // Deserialization failed, probably due to an API version mismatch.
+            // Refer to the Javadoc documentation on `EventDataObjectDeserializer` for
+            // instructions on how to handle this case, or return an error here.
+          }
           break;
         default:
-          // Unexpected event type
-          response.status(400);
-          return "";
+          // other event type
       }
-
       response.status(200);
       return "";
     });

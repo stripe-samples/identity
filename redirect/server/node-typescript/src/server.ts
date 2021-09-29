@@ -10,7 +10,7 @@ import Stripe from 'stripe';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2020-08-27',
   appInfo: { // For sample support and debugging, not required for production:
-    name: 'stripe-samples/<your-sample-name>',
+    name: 'stripe-samples/identity/redirect',
     url: 'https://github.com/stripe-samples',
     version: '0.0.1',
   },
@@ -100,20 +100,40 @@ app.post(
     const data: Stripe.Event.Data = event.data;
     const eventType: string = event.type;
 
-    if (eventType === 'payment_intent.succeeded') {
-      // Cast the event into a PaymentIntent to make use of the types.
-      const pi: Stripe.PaymentIntent = data.object as Stripe.PaymentIntent;
-      // Funds have been captured
-      // Fulfill any orders, e-mail receipts, etc
-      // To cancel the payment after capture you will need to issue a Refund (https://stripe.com/docs/api/refunds).
-      console.log(`🔔  Webhook received: ${pi.object} ${pi.status}!`);
-      console.log('💰 Payment captured!');
-    } else if (eventType === 'payment_intent.payment_failed') {
-      // Cast the event into a PaymentIntent to make use of the types.
-      const pi: Stripe.PaymentIntent = data.object as Stripe.PaymentIntent;
-      console.log(`🔔  Webhook received: ${pi.object} ${pi.status}!`);
-      console.log('❌ Payment failed.');
+    // Successfully constructed event
+    switch (eventType) {
+      case 'identity.verification_session.verified': {
+        // All the verification checks passed
+        const verificationSession: Stripe.Identity.VerificationSession = event.data.object as Stripe.Identity.VerificationSession;
+        break;
+      }
+      case 'identity.verification_session.requires_input': {
+        // At least one of the verification checks failed
+        const verificationSession: Stripe.Identity.VerificationSession = event.data.object as Stripe.Identity.VerificationSession;
+
+        console.log('Verification check failed: ' + verificationSession.last_error.reason);
+
+        // Handle specific failure reasons
+        switch (verificationSession.last_error.code) {
+          case 'document_unverified_other': {
+            // The document was invalid
+            break;
+          }
+          case 'document_expired': {
+            // The document was expired
+            break;
+          }
+          case 'document_type_not_supported': {
+            // document type not supported
+            break;
+          }
+          default: {
+            // ...
+          }
+        }
+      }
     }
+
     res.sendStatus(200);
   }
 );

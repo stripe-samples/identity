@@ -7,7 +7,7 @@ const env = require('dotenv').config({ path: './.env' });
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2020-08-27',
   appInfo: { // For sample support and debugging, not required for production:
-    name: "stripe-samples/<your-sample-name>",
+    name: "stripe-samples/identity/redirect",
     version: "0.0.1",
     url: "https://github.com/stripe-samples"
   }
@@ -94,15 +94,40 @@ app.post('/webhook', async (req, res) => {
     data = req.body.data;
     eventType = req.body.type;
   }
+  // Successfully constructed event
+  switch (eventType) {
+    case 'identity.verification_session.verified': {
+      // All the verification checks passed
+      const verificationSession = data.object;
+      break;
+    }
+    case 'identity.verification_session.requires_input': {
+      // At least one of the verification checks failed
+      const verificationSession = data.object;
 
-  if (eventType === 'payment_intent.succeeded') {
-    // Funds have been captured
-    // Fulfill any orders, e-mail receipts, etc
-    // To cancel the payment after capture you will need to issue a Refund (https://stripe.com/docs/api/refunds)
-    console.log('💰 Payment captured!');
-  } else if (eventType === 'payment_intent.payment_failed') {
-    console.log('❌ Payment failed.');
+      console.log('Verification check failed: ' + verificationSession.last_error.reason);
+
+      // Handle specific failure reasons
+      switch (verificationSession.last_error.code) {
+        case 'document_unverified_other': {
+          // The document was invalid
+          break;
+        }
+        case 'document_expired': {
+          // The document was expired
+          break;
+        }
+        case 'document_type_not_supported': {
+          // document type not supported
+          break;
+        }
+        default: {
+          // ...
+        }
+      }
+    }
   }
+
   res.sendStatus(200);
 });
 

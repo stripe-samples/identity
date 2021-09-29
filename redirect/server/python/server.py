@@ -10,7 +10,7 @@ load_dotenv(find_dotenv())
 
 # For sample support and debugging, not required for production:
 stripe.set_app_info(
-    'stripe-samples/your-sample-name',
+    'stripe-samples/identity/redirect',
     version='0.0.1',
     url='https://github.com/stripe-samples')
 
@@ -81,12 +81,23 @@ def webhook_received():
         event_type = request_data['type']
     data_object = data['object']
 
-    if event_type == 'payment_intent.succeeded':
-        print('💰 Payment received!')
-        # Fulfill any orders, e-mail receipts, etc
-        # To cancel the payment you will need to issue a Refund (https://stripe.com/docs/api/refunds)
-    elif event_type == 'payment_intent.payment_failed':
-        print('❌ Payment failed.')
+
+    if event['type'] == 'identity.verification_session.verified':
+        print("All the verification checks passed")
+        verification_session = data_object
+
+    elif event['type'] == 'identity.verification_session.requires_input':
+        print("At least one verification check failed")
+        verification_session = data_object
+
+        if verification_session.last_error.code == 'document_unverified_other':
+            print("The document was invalid")
+        elif verification_session.last_error.code == 'document_expired':
+            print("The document was expired")
+        elif verification_session.last_error.code == 'document_type_not_suported':
+            print("The document type was not supported")
+        else:
+            print("other error code")
     return jsonify({'status': 'success'})
 
 
