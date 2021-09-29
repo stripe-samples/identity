@@ -79,7 +79,11 @@ updates:
     directory: "/modal/server/dotnet/"
     schedule:
       interval: "weekly"
+    ignore:
+      - dependency-name: "Microsoft.AspNetCore.Mvc.NewtonsoftJson"
   - package-ecosystem: "nuget"
     directory: "/redirect/server/dotnet/"
     schedule:
       interval: "weekly"
+    ignore:
+      - dependency-name: "Microsoft.AspNetCore.Mvc.NewtonsoftJson"
