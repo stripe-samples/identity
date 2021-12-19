@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Stripe;
-using Stripe.Checkout;
+using Stripe.Identity;
 
 namespace server.Controllers
 {
@@ -43,11 +43,8 @@ namespace server.Controllers
           try
           {
             var verificationSession = await service.CreateAsync(options);
-
-            return Ok(new CreateVerificationSessionResponse
-            {
-                ClientSecret = verificationSession.ClientSecret,
-            });
+            Response.Headers["Location"] = verificationSession.Url;
+            return StatusCode(303);
           }
           catch (StripeException e)
           {
