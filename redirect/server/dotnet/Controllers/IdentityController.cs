@@ -43,8 +43,7 @@ namespace server.Controllers
           try
           {
             var verificationSession = await service.CreateAsync(options);
-
-            Response.Headers.Add("Location", verificationSession.Url);
+            Response.Headers["Location"] = verificationSession.Url;
             return StatusCode(303);
           }
           catch (StripeException e)
