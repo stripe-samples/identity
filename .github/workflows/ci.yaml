@@ -37,7 +37,7 @@ jobs:
           - server_type: go
             server_image: golang:1.15
           - server_type: dotnet
-            server_image: mcr.microsoft.com/dotnet/sdk:6.0
+            server_image: mcr.microsoft.com/dotnet/sdk:5.0
         target:
           - sample: modal
             tests: modal_server_spec.rb
@@ -53,6 +53,18 @@ jobs:
           - runtime:
               server_type: node-typescript
               server_image: node:12.22
+            target:
+              sample: redirect
+              tests: redirect_server_spec.rb
+          - runtime:
+              server_type: dotnet
+              server_image: mcr.microsoft.com/dotnet/sdk:5.0
+            target:
+              sample: modal
+              tests: modal_server_spec.rb
+          - runtime:
+              server_type: dotnet
+              server_image: mcr.microsoft.com/dotnet/sdk:5.0
             target:
               sample: redirect
               tests: redirect_server_spec.rb
