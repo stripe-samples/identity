@@ -1,5 +1,10 @@
 name: CI for stripe-samples/identity
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - "**"
+      - "!dependabot/**"
 
 env:
   STRIPE_PUBLISHABLE_KEY: ${{ secrets.TEST_STRIPE_PUBLISHABLE_KEY }}
@@ -73,9 +78,9 @@ jobs:
 
       - uses: actions/checkout@v2
         with:
-          repository: 'stripe-samples/sample-ci'
-          path: 'sample-ci'
-          ref: 'multiple-runtimes'
+          repository: "stripe-samples/sample-ci"
+          path: "sample-ci"
+          ref: "multiple-runtimes"
 
       - name: Setup dependencies
         run: |
