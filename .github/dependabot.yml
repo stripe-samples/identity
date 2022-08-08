@@ -10,80 +10,95 @@ updates:
     directory: "/modal/server/ruby/"
     schedule:
       interval: "weekly"
+      day: "thursday"
   - package-ecosystem: "bundler"
     directory: "/redirect/server/ruby/"
     schedule:
       interval: "weekly"
-
+      day: "thursday"
 
   # python dependencies
   - package-ecosystem: "pip"
     directory: "/modal/server/python/"
     schedule:
       interval: "weekly"
+      day: "thursday"
   - package-ecosystem: "pip"
     directory: "/redirect/server/python/"
     schedule:
       interval: "weekly"
+      day: "thursday"
 
   # php dependencies
   - package-ecosystem: "composer"
     directory: "/modal/server/php/"
     schedule:
       interval: "weekly"
+      day: "thursday"
   - package-ecosystem: "composer"
     directory: "/redirect/server/php/"
     schedule:
       interval: "weekly"
+      day: "thursday"
 
   # node dependencies
   - package-ecosystem: "npm"
     directory: "/modal/server/node/"
     schedule:
       interval: "weekly"
+      day: "thursday"
   - package-ecosystem: "npm"
     directory: "/modal/server/node-typescript/"
     schedule:
       interval: "weekly"
+      day: "thursday"
   - package-ecosystem: "npm"
     directory: "/redirect/server/node/"
     schedule:
       interval: "weekly"
+      day: "thursday"
   - package-ecosystem: "npm"
     directory: "/redirect/server/node-typescript/"
     schedule:
       interval: "weekly"
+      day: "thursday"
 
   # go dependencies
   - package-ecosystem: "gomod"
     directory: "/modal/server/go/"
     schedule:
       interval: "weekly"
+      day: "thursday"
   - package-ecosystem: "gomod"
     directory: "/redirect/server/go/"
     schedule:
       interval: "weekly"
+      day: "thursday"
 
   # java dependencies
   - package-ecosystem: "maven"
     directory: "/modal/server/java/"
     schedule:
       interval: "weekly"
+      day: "thursday"
   - package-ecosystem: "maven"
     directory: "/redirect/server/java/"
     schedule:
       interval: "weekly"
+      day: "thursday"
 
   # dotnet dependencies
   - package-ecosystem: "nuget"
     directory: "/modal/server/dotnet/"
     schedule:
       interval: "weekly"
+      day: "thursday"
     ignore:
       - dependency-name: "Microsoft.AspNetCore.Mvc.NewtonsoftJson"
   - package-ecosystem: "nuget"
     directory: "/redirect/server/dotnet/"
     schedule:
       interval: "weekly"
+      day: "thursday"
     ignore:
       - dependency-name: "Microsoft.AspNetCore.Mvc.NewtonsoftJson"
