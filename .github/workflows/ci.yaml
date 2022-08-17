@@ -62,13 +62,13 @@ jobs:
               tests: redirect_server_spec.rb
           - runtime:
               server_type: dotnet
-              server_image: mcr.microsoft.com/dotnet/sdk:5.0
+              server_image: mcr.microsoft.com/dotnet/sdk:6.0
             target:
               sample: modal
               tests: modal_server_spec.rb
           - runtime:
               server_type: dotnet
-              server_image: mcr.microsoft.com/dotnet/sdk:5.0
+              server_image: mcr.microsoft.com/dotnet/sdk:6.0
             target:
               sample: redirect
               tests: redirect_server_spec.rb
