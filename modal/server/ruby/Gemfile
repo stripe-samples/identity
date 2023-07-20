@@ -3,6 +3,6 @@ source 'https://rubygems.org/'
 gem 'dotenv'
 gem 'json'
 gem 'sinatra'
-gem 'stripe', '7.1.0'
+gem 'stripe', '8.6.0'
 gem 'webrick'
 
