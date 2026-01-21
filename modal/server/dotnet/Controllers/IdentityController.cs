@@ -80,11 +80,11 @@ namespace server.Controllers
             }
 
 
-            if (stripeEvent.Type == Events.IdentityVerificationSessionVerified) {
+            if (stripeEvent.Type == EventTypes.IdentityVerificationSessionVerified) {
               var verificationSession = stripeEvent.Data.Object as VerificationSession;
               // All the verification checks passed
 
-            } else if (stripeEvent.Type == Events.IdentityVerificationSessionRequiresInput) {
+            } else if (stripeEvent.Type == EventTypes.IdentityVerificationSessionRequiresInput) {
               var verificationSession = stripeEvent.Data.Object as VerificationSession;
               if (verificationSession.LastError.Code == "document_unverified_other") {
                 // The document was invalid
