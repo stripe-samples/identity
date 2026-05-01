@@ -105,8 +105,8 @@ jobs:
         if: ${{ failure() }}
         run: |
           # Redact Stripe secret keys, restricted keys, and webhook secrets
-# before logging. Publishable keys (pk_) are safe to log.
-cat .env | sed 's/=\(sk_\|rk_\|whsec_\)[^[:space:]]*/=[REDACTED]/g'
+          # before logging. Publishable keys (pk_) are safe to log.
+          cat .env | sed 's/=\(sk_\|rk_\|whsec_\)[^[:space:]]*/=[REDACTED]/g'
           cat docker-compose.yml
           docker-compose ps -a
           docker-compose logs web
