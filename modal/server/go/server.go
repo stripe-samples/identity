@@ -93,6 +93,7 @@ func handleCreateVerificationSession(w http.ResponseWriter, r *http.Request) {
 		//   }
 		// },
 	}
+	// Replace with the ID of the user in your database.
 	params.AddMetadata("user_id", "{{USER_ID}}")
 	vs, err := verificationsession.New(params)
 	if err != nil {

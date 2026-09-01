@@ -45,7 +45,8 @@ post '/create-verification-session' do
   verification_session = Stripe::Identity::VerificationSession.create({
     type: 'document', # or 'id_number', or 'address'
     metadata: {
-      user_id: '{{USER_ID}}', # Optionally pass the ID of the user in your system.
+      # Replace with the ID of the user in your database.
+      user_id: '{{USER_ID}}',
     },
 
     # Additional options for configuring the verification session:

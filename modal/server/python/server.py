@@ -41,6 +41,7 @@ def create_verification_session():
         verification_session = stripe.identity.VerificationSession.create(
             type='document',
             metadata={
+                # Replace with the ID of the user in your database.
                 'user_id': '{{USER_ID}}',
             }
         )
