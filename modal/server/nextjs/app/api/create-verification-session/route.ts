@@ -7,6 +7,7 @@ export async function POST() {
       await stripe.identity.verificationSessions.create({
         type: "document",
         metadata: {
+          // Replace with the ID of the user in your database.
           user_id: "{{USER_ID}}",
         },
         // Additional options for configuring the verification session:

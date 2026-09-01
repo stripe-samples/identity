@@ -47,6 +47,7 @@ app.post('/create-verification-session', async (req, res) => {
     const verificationSession = await stripe.identity.verificationSessions.create({
       type: 'document',
       metadata: {
+        // Replace with the ID of the user in your database.
         user_id: '{{USER_ID}}',
       }
 

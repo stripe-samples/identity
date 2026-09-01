@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
 $verification_session = $stripe->identity->verificationSessions->create([
   'type' => 'document',
   'metadata' => [
+    // Replace with the ID of the user in your database.
     'user_id' => '{{USER_ID}}',
   ]
 ]);
