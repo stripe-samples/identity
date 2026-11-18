@@ -114,7 +114,7 @@ Dotenv.load
 # keys at https://dashboard.stripe.com/apikeys.
 Stripe.api_key = ENV['STRIPE_SECRET_KEY']
 Stripe.max_network_retries = 2
-Stripe.api_version = "2020-08-27"
+Stripe.api_version = "2026-10-28.endive"
 
 def server_url
   SERVER_URL

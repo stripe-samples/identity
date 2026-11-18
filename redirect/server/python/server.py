@@ -14,7 +14,7 @@ stripe.set_app_info(
     version='0.0.1',
     url='https://github.com/stripe-samples')
 
-stripe.api_version = '2020-08-27'
+stripe.api_version = '2026-10-28.endive'
 # Don't put any keys in code. Use an environment variable (as shown
 # here) or secrets vault to supply keys to your integration.
 #
@@ -87,7 +87,7 @@ def webhook_received():
             print("The document was invalid")
         elif verification_session.last_error.code == 'document_expired':
             print("The document was expired")
-        elif verification_session.last_error.code == 'document_type_not_suported':
+        elif verification_session.last_error.code == 'document_type_not_supported':
             print("The document type was not supported")
         else:
             print("other error code")
