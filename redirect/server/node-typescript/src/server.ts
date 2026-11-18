@@ -13,7 +13,7 @@ import Stripe from 'stripe';
 // See https://docs.stripe.com/keys-best-practices and find your
 // keys at https://dashboard.stripe.com/apikeys.
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2020-08-27',
+  apiVersion: '2026-10-28.endive',
   appInfo: { // For sample support and debugging, not required for production:
     name: 'stripe-samples/identity/redirect',
     url: 'https://github.com/stripe-samples',

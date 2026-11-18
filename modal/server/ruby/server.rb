@@ -13,7 +13,7 @@ Stripe.set_app_info(
   version: '0.0.1',
   url: 'https://github.com/stripe-samples'
 )
-Stripe.api_version = '2020-08-27'
+Stripe.api_version = '2026-10-28.endive'
 # Don't put any keys in code. Use an environment variable (as shown
 # here) or secrets vault to supply keys to your integration.
 #
@@ -117,7 +117,7 @@ post '/webhook' do
       # The document was invalid
     when 'document_expired'
       # The document was expired
-    when 'document_type_not_suported'
+    when 'document_type_not_supported'
       # The document type was not supported
     else
       # ...
